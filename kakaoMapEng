@@ -1,0 +1,53 @@
+<input type="text" id="sample6_postcode" placeholder="Zip code">
+<input type="button" onclick="sample6_execDaumPostcode()" value="Address search"><br>
+<input type="text" id="sample6_address" placeholder="Address"><br>
+<input type="text" id="sample6_detailAddress" placeholder="Detailed address">
+<input type="text" id="sample6_extraAddress" placeholder="additional information">
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    function sample6_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // When you click on specific address from the popup after you've searched for address
+
+                // Composing address based on the expousre regulation from the data
+                // If you didn't inherit any variable, it would have a value of ('').
+                var addr = ''; // Varaiable for address
+                var extraAddr = ''; // Varaiable for additional address
+
+                //Loading address value based on the user's selection
+                if (data.userSelectedType === 'R') { // If user select road address
+                    addr = data.roadAddress;
+                } else { // If user select old-type address (J)
+                    addr = data.jibunAddress;
+                }
+
+                // If user selects road address, combine additonal information
+                if(data.userSelectedType === 'R'){                    
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraAddr += data.bname;
+                    }
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    
+                    if(extraAddr !== ''){
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                    
+                    document.getElementById("sample6_extraAddress").value = extraAddr;
+                
+                } else {
+                    document.getElementById("sample6_extraAddress").value = '';
+                }
+
+                // Getting all those information of address into the field
+                document.getElementById('sample6_postcode').value = data.zonecode;
+                document.getElementById("sample6_address").value = addr;
+                // Moving cursor to specific address field to complete the address inputting.
+                document.getElementById("sample6_detailAddress").focus();
+            }
+        }).open();
+    }
+</script>
